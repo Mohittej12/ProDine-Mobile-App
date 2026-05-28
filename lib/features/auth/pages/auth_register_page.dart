@@ -208,13 +208,16 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
             // Institutional Footer
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Already have an account?',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
+                const Flexible(
+                  child: Text(
+                    'Already have an account?',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
                 TextButton(

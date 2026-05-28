@@ -597,6 +597,7 @@ class _ModeCard extends StatelessWidget {
                     ],
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 180),

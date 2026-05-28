@@ -8,6 +8,11 @@ class AppRoutes {
   static const String verifyMobile = '/verify-mobile';
   static const String onboarding = '/onboarding';
 
+  // Employee Auth
+  static const String employeeLogin = '/employee-login';
+  static const String employeeSignup = '/employee-signup';
+  static const String employeePhoneVerification = '/employee-phone-verification';
+
   // Employee
   static const String employeeModeSelection = '/employee/mode-selection';
   static const String employeeHome = '/employee/home';
