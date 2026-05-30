@@ -9,7 +9,6 @@ class AuthRepository {
 
   // ========== Basic Auth ==========
 
-  // Sign up
   Future<AuthResponse> signUp({
     required String email,
     required String password,
@@ -17,7 +16,6 @@ class AuthRepository {
     return await _supabaseService.signUp(email, password);
   }
 
-  // Sign in
   Future<AuthResponse> signIn({
     required String email,
     required String password,
@@ -25,79 +23,86 @@ class AuthRepository {
     return await _supabaseService.signIn(email, password);
   }
 
-  // Sign out
+  Future<AuthResponse> signInWithPhone({
+    required String phone,
+    required String password,
+  }) async {
+    return await _supabaseService.signIn(
+      _authEmailForPhone(phone),
+      password,
+    );
+  }
+
   Future<void> signOut() async {
     return await _supabaseService.signOut();
   }
 
-  // Get current user
   User? getCurrentUser() {
     return _supabaseService.getCurrentUser();
   }
 
-  // Check if user is authenticated
   bool isUserAuthenticated() {
     return _supabaseService.getCurrentUser() != null;
   }
 
-  // Get current user email
   String? getUserEmail() {
     return _supabaseService.getCurrentUser()?.email;
   }
 
   // ========== Employee Signup Flow ==========
 
-  /// Step 1: Create employee account and auth user
-  /// Skipping OTP verification for now - all fields saved directly to database
   Future<EmployeeProfile> signUpEmployee({
     required EmployeeSignupRequest request,
   }) async {
     try {
-      print('👤 Starting employee signup for: ${request.email}');
-      
-      // Create Supabase auth user
-      print('🔐 Creating Supabase auth user...');
-      final authResponse = await _supabaseService.signUp(
-        request.email,
-        request.password,
-      );
+      final normalizedPhone = _toInternationalPhone(request.mobileNumber);
 
-      if (authResponse.user == null) {
-        throw Exception('Failed to create user account - user is null');
+      print('Starting employee signup for: ${request.employeeId}');
+
+      if (request.email != null) {
+        final emailExists = await isEmployeeEmailExists(request.email!);
+        if (emailExists) throw Exception('Email already registered');
       }
 
-      print('✅ Auth user created with ID: ${authResponse.user!.id}');
+      final authEmail = request.email ?? _authEmailForPhone(normalizedPhone);
 
-      // Store employee profile in database
-      final employeeData = {
-        'user_id': authResponse.user!.id,
-        'employee_id': request.employeeId,
-        'full_name': request.fullName,
-        'mobile_number': request.mobileNumber,
-        'email': request.email,
-        'is_phone_verified': false,
-        'user_type': 'employee',
-      };
+      final authResponse = request.email == null
+          ? await _supabaseService.signUp(
+              authEmail,
+              request.password,
+            )
+          : await _supabaseService.signUp(
+              request.email!,
+              request.password,
+            );
 
-      print('💾 Storing employee profile in database: $employeeData');
+      final user = authResponse.user;
+      if (user == null) {
+        throw Exception('Failed to create user account');
+      }
 
-      final response = await _supabaseService.insertData(
-        'employee_profiles',
-        employeeData,
-      );
+      final profileResponse = await _supabaseService.client
+          .rpc(
+            'create_employee_profile',
+            params: {
+              'p_user_id': user.id,
+              'p_employee_id': request.employeeId,
+              'p_full_name': request.fullName,
+              'p_mobile_number': normalizedPhone,
+              'p_email': request.email?.toLowerCase(),
+              'p_terms_accepted': request.termsAccepted,
+            },
+          )
+          .select()
+          .single();
 
-      print('✅ Employee profile stored successfully');
-      print('✅ Account created! Phone verification skipped. Please login now.');
-      
-      return EmployeeProfile.fromJson(response);
+      return EmployeeProfile.fromJson(profileResponse);
     } catch (e) {
-      print('❌ Employee signup error: $e');
-      print('❌ Stack trace: ${StackTrace.current}');
+      print('Employee signup error: $e');
       rethrow;
     }
   }
 
-  /// Step 2: Verify phone number with OTP
   Future<bool> verifyEmployeePhone({
     required String phoneNumber,
     required String otpCode,
@@ -109,12 +114,11 @@ class AuthRepository {
       );
 
       if (isValid) {
-        // Update employee profile to mark phone as verified
         await _supabaseService.updateData(
           'employee_profiles',
           {'is_phone_verified': true},
           'mobile_number',
-          phoneNumber,
+          _toInternationalPhone(phoneNumber),
         );
         return true;
       }
@@ -125,7 +129,6 @@ class AuthRepository {
     }
   }
 
-  /// Step 3: Get employee profile by user ID
   Future<EmployeeProfile?> getEmployeeProfile(String userId) async {
     try {
       final response = await _supabaseService.client
@@ -142,7 +145,6 @@ class AuthRepository {
     }
   }
 
-  /// Resend OTP
   Future<void> resendOTP(String phoneNumber) async {
     try {
       await _phoneVerificationService.resendOTP(phoneNumber);
@@ -152,35 +154,74 @@ class AuthRepository {
     }
   }
 
-  /// Check if phone number exists
   Future<bool> isPhoneNumberExists(String phoneNumber) async {
     try {
-      final response = await _supabaseService.client
-          .from('employee_profiles')
-          .select()
-          .eq('mobile_number', phoneNumber)
-          .maybeSingle();
+      final response = await _supabaseService.client.rpc(
+        'employee_profile_exists',
+        params: {
+          'p_employee_id': null,
+          'p_mobile_number': _toInternationalPhone(phoneNumber),
+          'p_email': null,
+        },
+      );
 
-      return response != null;
+      return response == true;
     } catch (e) {
       print('Check phone error: $e');
       return false;
     }
   }
 
-  /// Check if employee ID exists
   Future<bool> isEmployeeIdExists(String employeeId) async {
     try {
-      final response = await _supabaseService.client
-          .from('employee_profiles')
-          .select()
-          .eq('employee_id', employeeId)
-          .maybeSingle();
+      final response = await _supabaseService.client.rpc(
+        'employee_profile_exists',
+        params: {
+          'p_employee_id': employeeId,
+          'p_mobile_number': null,
+          'p_email': null,
+        },
+      );
 
-      return response != null;
+      return response == true;
     } catch (e) {
       print('Check employee ID error: $e');
       return false;
     }
+  }
+
+  Future<bool> isEmployeeEmailExists(String email) async {
+    try {
+      final response = await _supabaseService.client.rpc(
+        'employee_profile_exists',
+        params: {
+          'p_employee_id': null,
+          'p_mobile_number': null,
+          'p_email': email.toLowerCase(),
+        },
+      );
+
+      return response == true;
+    } catch (e) {
+      print('Check email error: $e');
+      return false;
+    }
+  }
+
+  String _toInternationalPhone(String value) {
+    final trimmed = value.trim();
+    if (trimmed.startsWith('+')) {
+      return '+${trimmed.replaceAll(RegExp(r'[^0-9]'), '')}';
+    }
+
+    final digits = trimmed.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length == 10) return '+91$digits';
+    if (digits.startsWith('91') && digits.length == 12) return '+$digits';
+    return '+$digits';
+  }
+
+  String _authEmailForPhone(String phone) {
+    final digits = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    return 'employee_$digits@prodine.local';
   }
 }

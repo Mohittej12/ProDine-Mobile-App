@@ -60,7 +60,8 @@ class EmployeeAuthProvider extends ChangeNotifier {
   // ========== LOGIN ==========
 
   Future<void> loginEmployee({
-    required String email,
+    String? email,
+    String? mobileNumber,
     required String password,
   }) async {
     _isLoading = true;
@@ -68,10 +69,15 @@ class EmployeeAuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _authRepository.signIn(
-        email: email,
-        password: password,
-      );
+      final response = mobileNumber == null
+          ? await _authRepository.signIn(
+              email: email!,
+              password: password,
+            )
+          : await _authRepository.signInWithPhone(
+              phone: mobileNumber,
+              password: password,
+            );
       _currentUser = response.user;
       await _loadEmployeeProfile();
       _currentStep = AuthStep.verified;
@@ -108,8 +114,9 @@ class EmployeeAuthProvider extends ChangeNotifier {
     required String employeeId,
     required String fullName,
     required String mobileNumber,
-    required String email,
+    String? email,
     required String password,
+    bool termsAccepted = true,
   }) async {
     _isLoading = true;
     _clearErrors();
@@ -120,8 +127,8 @@ class EmployeeAuthProvider extends ChangeNotifier {
       if (employeeId.isEmpty) throw Exception('Employee ID is required');
       if (fullName.isEmpty) throw Exception('Full Name is required');
       if (mobileNumber.isEmpty) throw Exception('Mobile Number is required');
-      if (email.isEmpty) throw Exception('Email is required');
       if (password.isEmpty) throw Exception('Password is required');
+      if (!termsAccepted) throw Exception('Please agree to the terms');
 
       if (mobileNumber.length < 10) {
         throw Exception('Mobile Number must be at least 10 digits');
@@ -136,7 +143,8 @@ class EmployeeAuthProvider extends ChangeNotifier {
       if (idExists) throw Exception('Employee ID already registered');
 
       // Check if phone number already exists
-      final phoneExists = await _authRepository.isPhoneNumberExists(mobileNumber);
+      final phoneExists =
+          await _authRepository.isPhoneNumberExists(mobileNumber);
       if (phoneExists) throw Exception('Phone number already registered');
 
       // Create account
@@ -146,14 +154,14 @@ class EmployeeAuthProvider extends ChangeNotifier {
         mobileNumber: mobileNumber,
         email: email,
         password: password,
+        termsAccepted: termsAccepted,
       );
 
       final profile = await _authRepository.signUpEmployee(request: request);
 
       _currentUser = _authRepository.getCurrentUser();
       _employeeProfile = profile;
-      
-      // ✅ Account created successfully - go back to login
+
       _currentStep = AuthStep.login;
       _errorMessage = 'Account created successfully! Please login.';
 
@@ -248,7 +256,8 @@ class EmployeeAuthProvider extends ChangeNotifier {
   Future<void> _loadEmployeeProfile() async {
     try {
       if (_currentUser == null) return;
-      _employeeProfile = await _authRepository.getEmployeeProfile(_currentUser!.id);
+      _employeeProfile =
+          await _authRepository.getEmployeeProfile(_currentUser!.id);
       notifyListeners();
     } catch (e) {
       print('Load employee profile error: $e');

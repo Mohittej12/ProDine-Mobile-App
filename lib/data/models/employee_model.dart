@@ -2,15 +2,17 @@ class EmployeeSignupRequest {
   final String employeeId;
   final String fullName;
   final String mobileNumber;
-  final String email;
+  final String? email;
   final String password;
+  final bool termsAccepted;
 
   EmployeeSignupRequest({
     required this.employeeId,
     required this.fullName,
     required this.mobileNumber,
-    required this.email,
     required this.password,
+    this.email,
+    this.termsAccepted = true,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,7 +21,7 @@ class EmployeeSignupRequest {
       'full_name': fullName,
       'mobile_number': mobileNumber,
       'email': email,
-      'password': password,
+      'terms_accepted': termsAccepted,
     };
   }
 }
@@ -30,7 +32,9 @@ class EmployeeProfile {
   final String employeeId;
   final String fullName;
   final String mobileNumber;
-  final String email;
+  final String? email;
+  final bool termsAccepted;
+  final DateTime? termsAcceptedAt;
   final bool isPhoneVerified;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -41,7 +45,9 @@ class EmployeeProfile {
     required this.employeeId,
     required this.fullName,
     required this.mobileNumber,
-    required this.email,
+    this.email,
+    required this.termsAccepted,
+    this.termsAcceptedAt,
     required this.isPhoneVerified,
     required this.createdAt,
     required this.updatedAt,
@@ -54,7 +60,11 @@ class EmployeeProfile {
       employeeId: json['employee_id'] as String,
       fullName: json['full_name'] as String,
       mobileNumber: json['mobile_number'] as String,
-      email: json['email'] as String,
+      email: json['email'] as String?,
+      termsAccepted: json['terms_accepted'] as bool? ?? false,
+      termsAcceptedAt: json['terms_accepted_at'] == null
+          ? null
+          : DateTime.parse(json['terms_accepted_at'] as String),
       isPhoneVerified: json['is_phone_verified'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
@@ -69,6 +79,8 @@ class EmployeeProfile {
       'full_name': fullName,
       'mobile_number': mobileNumber,
       'email': email,
+      'terms_accepted': termsAccepted,
+      'terms_accepted_at': termsAcceptedAt?.toIso8601String(),
       'is_phone_verified': isPhoneVerified,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),

@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pro_dine/core/constants/app_colors.dart';
 import 'package:pro_dine/core/constants/app_routes.dart';
+import 'package:pro_dine/core/services/providers/employee_auth_provider.dart';
 import 'package:pro_dine/core/widgets/app_button.dart';
 import 'package:pro_dine/core/widgets/app_text_field.dart';
 import 'package:pro_dine/features/employee/data/employee_cart_store.dart';
+import 'package:provider/provider.dart';
 
 class AuthLoginPage extends StatefulWidget {
   const AuthLoginPage({super.key});
@@ -65,7 +67,11 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
     return Icons.phone_android_rounded;
   }
 
-  void _handleSignIn() {
+  Future<void> _handleSignIn(
+    EmployeeAuthProvider authProvider,
+    String mobileNumber,
+    String password,
+  ) async {
     if (_isVendor) {
       context.push(AppRoutes.vendorDashboard);
       return;
@@ -76,13 +82,28 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
       return;
     }
 
-    // Clear cart on fresh employee login
-    EmployeeCartStore.instance.clear();
-    context.push(AppRoutes.employeeModeSelection);
+    try {
+      await authProvider.loginEmployee(
+        mobileNumber: mobileNumber,
+        password: password,
+      );
+
+      if (!mounted) return;
+      EmployeeCartStore.instance.clear();
+      context.push(AppRoutes.employeeModeSelection);
+    } catch (_) {
+      if (!mounted) return;
+      final message = authProvider.errorMessage ?? 'Sign in failed';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final employeeAuthProvider = context.watch<EmployeeAuthProvider>();
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -134,7 +155,11 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                           onTermsChanged: (value) {
                             setState(() => _agreeToTerms = value ?? false);
                           },
-                          onSignIn: _handleSignIn,
+                          onSignIn: (mobileNumber, password) => _handleSignIn(
+                            employeeAuthProvider,
+                            mobileNumber,
+                            password,
+                          ),
                         )
                       : _MobileAuthLayout(
                           heroImage: _heroImage,
@@ -154,7 +179,11 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
                           onTermsChanged: (value) {
                             setState(() => _agreeToTerms = value ?? false);
                           },
-                          onSignIn: _handleSignIn,
+                          onSignIn: (mobileNumber, password) => _handleSignIn(
+                            employeeAuthProvider,
+                            mobileNumber,
+                            password,
+                          ),
                         ),
                 ),
               ),
@@ -180,7 +209,7 @@ class _WideAuthLayout extends StatelessWidget {
   final bool agreeToTerms;
   final ValueChanged<_AuthRole> onRoleChanged;
   final ValueChanged<bool?> onTermsChanged;
-  final VoidCallback onSignIn;
+  final void Function(String mobileNumber, String password) onSignIn;
 
   const _WideAuthLayout({
     required this.heroImage,
@@ -250,7 +279,7 @@ class _MobileAuthLayout extends StatelessWidget {
   final bool agreeToTerms;
   final ValueChanged<_AuthRole> onRoleChanged;
   final ValueChanged<bool?> onTermsChanged;
-  final VoidCallback onSignIn;
+  final void Function(String mobileNumber, String password) onSignIn;
 
   const _MobileAuthLayout({
     required this.heroImage,
@@ -501,7 +530,7 @@ class _LoginCard extends StatefulWidget {
   final bool agreeToTerms;
   final ValueChanged<_AuthRole> onRoleChanged;
   final ValueChanged<bool?> onTermsChanged;
-  final VoidCallback onSignIn;
+  final void Function(String mobileNumber, String password) onSignIn;
   final bool isFullPage;
 
   const _LoginCard({
@@ -550,7 +579,10 @@ class _LoginCardState extends State<_LoginCard> {
       );
       return;
     }
-    widget.onSignIn();
+    widget.onSignIn(
+      _mobileController.text.trim(),
+      _passwordController.text,
+    );
   }
 
   void _openTermsPage() {

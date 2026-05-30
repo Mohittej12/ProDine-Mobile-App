@@ -37,11 +37,33 @@ class SupabaseService {
     }
   }
 
+  Future<AuthResponse> signUpWithPhone(String phone, String password) async {
+    try {
+      return await _client.auth.signUp(phone: phone, password: password);
+    } catch (e) {
+      print('Phone sign up error: $e');
+      rethrow;
+    }
+  }
+
   Future<AuthResponse> signIn(String email, String password) async {
     try {
-      return await _client.auth.signInWithPassword(email: email, password: password);
+      return await _client.auth
+          .signInWithPassword(email: email, password: password);
     } catch (e) {
       print('Sign in error: $e');
+      rethrow;
+    }
+  }
+
+  Future<AuthResponse> signInWithPhone(String phone, String password) async {
+    try {
+      return await _client.auth.signInWithPassword(
+        phone: phone,
+        password: password,
+      );
+    } catch (e) {
+      print('Phone sign in error: $e');
       rethrow;
     }
   }
@@ -78,20 +100,17 @@ class SupabaseService {
     try {
       print('🔍 Attempting to insert into table: $tableName');
       print('📤 Data to insert: $data');
-      
+
       // Check if client is initialized
       if (_client == null) {
         throw Exception('Supabase client is not initialized!');
       }
-      
+
       print('✅ Supabase client is initialized');
-      
-      final response = await _client
-          .from(tableName)
-          .insert(data)
-          .select()
-          .single();
-      
+
+      final response =
+          await _client.from(tableName).insert(data).select().single();
+
       print('✅ Data inserted successfully!');
       print('📥 Response: $response');
       return response as Map<String, dynamic>;

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pro_dine/core/constants/app_colors.dart';
 import 'package:pro_dine/core/constants/app_routes.dart';
+import 'package:pro_dine/core/services/providers/employee_auth_provider.dart';
 import 'package:pro_dine/core/widgets/app_button.dart';
 import 'package:pro_dine/core/widgets/app_text_field.dart';
 import 'package:pro_dine/features/auth/widgets/auth_scaffold.dart';
+import 'package:provider/provider.dart';
 
 class AuthRegisterPage extends StatefulWidget {
   const AuthRegisterPage({super.key});
@@ -31,7 +33,7 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
     super.dispose();
   }
 
-  void _createAccount() {
+  Future<void> _createAccount(EmployeeAuthProvider authProvider) async {
     if (!_formKey.currentState!.validate()) return;
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -41,14 +43,34 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
       );
       return;
     }
-    context.push(
-      AppRoutes.verifyMobile,
-      extra: _mobileController.text.trim(),
-    );
+
+    try {
+      await authProvider.createEmployeeAccount(
+        employeeId: _employeeIdController.text.trim(),
+        fullName: _fullNameController.text.trim(),
+        mobileNumber: _mobileController.text.trim(),
+        password: _passwordController.text,
+        termsAccepted: _agreeToTerms,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account created. Please sign in.')),
+      );
+      context.go(AppRoutes.login);
+    } catch (_) {
+      if (!mounted) return;
+      final message = authProvider.errorMessage ?? 'Account creation failed';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<EmployeeAuthProvider>();
+
     return AuthScaffold(
       gradient: AppColors.registerGradient,
       body: Form(
@@ -201,7 +223,8 @@ class _AuthRegisterPageState extends State<AuthRegisterPage> {
             const SizedBox(height: 32),
             AppButton(
               text: 'Create Account',
-              onPressed: _createAccount,
+              isLoading: authProvider.isLoading,
+              onPressed: () => _createAccount(authProvider),
             ),
             const SizedBox(height: 24),
 
