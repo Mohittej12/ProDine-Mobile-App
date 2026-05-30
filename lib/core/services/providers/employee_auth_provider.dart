@@ -37,7 +37,7 @@ class EmployeeAuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   AuthStep get currentStep => _currentStep;
-  bool get isAuthenticated => _currentUser != null;
+  bool get isAuthenticated => _employeeProfile != null;
   String? get verificationPhoneNumber => _verificationPhoneNumber;
   int get resendCountdown => _resendCountdown;
 
@@ -69,17 +69,13 @@ class EmployeeAuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = mobileNumber == null
-          ? await _authRepository.signIn(
-              email: email!,
-              password: password,
-            )
-          : await _authRepository.signInWithPhone(
-              phone: mobileNumber,
-              password: password,
-            );
-      _currentUser = response.user;
-      await _loadEmployeeProfile();
+      final profile = await _authRepository.loginEmployee(
+        email: email,
+        mobileNumber: mobileNumber,
+        password: password,
+      );
+      _currentUser = null;
+      _employeeProfile = profile;
       _currentStep = AuthStep.verified;
       notifyListeners();
     } catch (e) {
@@ -159,7 +155,7 @@ class EmployeeAuthProvider extends ChangeNotifier {
 
       final profile = await _authRepository.signUpEmployee(request: request);
 
-      _currentUser = _authRepository.getCurrentUser();
+      _currentUser = null;
       _employeeProfile = profile;
 
       _currentStep = AuthStep.login;

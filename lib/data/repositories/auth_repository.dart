@@ -27,9 +27,8 @@ class AuthRepository {
     required String phone,
     required String password,
   }) async {
-    return await _supabaseService.signIn(
-      _authEmailForPhone(phone),
-      password,
+    throw UnsupportedError(
+      'Employee phone/password login uses employee_profiles, not Supabase Auth.',
     );
   }
 
@@ -64,32 +63,15 @@ class AuthRepository {
         if (emailExists) throw Exception('Email already registered');
       }
 
-      final authEmail = request.email ?? _authEmailForPhone(normalizedPhone);
-
-      final authResponse = request.email == null
-          ? await _supabaseService.signUp(
-              authEmail,
-              request.password,
-            )
-          : await _supabaseService.signUp(
-              request.email!,
-              request.password,
-            );
-
-      final user = authResponse.user;
-      if (user == null) {
-        throw Exception('Failed to create user account');
-      }
-
       final profileResponse = await _supabaseService.client
           .rpc(
             'create_employee_profile',
             params: {
-              'p_user_id': user.id,
               'p_employee_id': request.employeeId,
               'p_full_name': request.fullName,
               'p_mobile_number': normalizedPhone,
               'p_email': request.email?.toLowerCase(),
+              'p_password': request.password,
               'p_terms_accepted': request.termsAccepted,
             },
           )
@@ -99,6 +81,34 @@ class AuthRepository {
       return EmployeeProfile.fromJson(profileResponse);
     } catch (e) {
       print('Employee signup error: $e');
+      rethrow;
+    }
+  }
+
+  Future<EmployeeProfile> loginEmployee({
+    String? email,
+    String? mobileNumber,
+    required String password,
+  }) async {
+    try {
+      final normalizedPhone =
+          mobileNumber == null ? null : _toInternationalPhone(mobileNumber);
+
+      final profileResponse = await _supabaseService.client
+          .rpc(
+            'login_employee',
+            params: {
+              'p_mobile_number': normalizedPhone,
+              'p_email': email?.toLowerCase(),
+              'p_password': password,
+            },
+          )
+          .select()
+          .single();
+
+      return EmployeeProfile.fromJson(profileResponse);
+    } catch (e) {
+      print('Employee login error: $e');
       rethrow;
     }
   }

@@ -1,18 +1,20 @@
 -- ============================================
 -- Employee Authentication Database Schema
--- ============================================
+-- Development flow: no OTP, SMS verification, email verification, or Supabase Auth signup.
 -- Run this complete script in the Supabase SQL Editor.
--- It reuses public.employee_profiles and does not drop employee data.
+-- ============================================
 
-create extension if not exists pgcrypto;
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
 
 create table if not exists public.employee_profiles (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid not null unique references auth.users(id) on delete cascade,
+  user_id uuid not null unique default gen_random_uuid(),
   employee_id text not null unique,
   full_name text not null,
   mobile_number text not null unique,
   email text unique,
+  password_hash text,
   terms_accepted boolean not null default false,
   terms_accepted_at timestamptz,
   is_phone_verified boolean not null default false,
@@ -25,7 +27,13 @@ create table if not exists public.employee_profiles (
   )
 );
 
+-- If an earlier Supabase Auth-based schema exists, remove the dependency on auth.users.
 alter table public.employee_profiles
+  drop constraint if exists employee_profiles_user_id_fkey;
+
+alter table public.employee_profiles
+  alter column user_id set default gen_random_uuid(),
+  add column if not exists password_hash text,
   add column if not exists terms_accepted boolean not null default false,
   add column if not exists terms_accepted_at timestamptz,
   add column if not exists is_phone_verified boolean not null default false,
@@ -42,7 +50,6 @@ create unique index if not exists employee_profiles_mobile_number_uidx
 create unique index if not exists employee_profiles_email_uidx
   on public.employee_profiles(lower(email))
   where email is not null;
-
 create index if not exists employee_profiles_created_at_idx
   on public.employee_profiles(created_at);
 
@@ -61,8 +68,6 @@ create trigger set_employee_profiles_updated_at
 before update on public.employee_profiles
 for each row execute function public.set_updated_at();
 
--- Kept for the existing phone verification service, even though employee
--- registration/login currently skip OTP and email verification.
 create table if not exists public.verification_codes (
   id uuid primary key default gen_random_uuid(),
   phone_number text not null,
@@ -88,7 +93,7 @@ create or replace function public.employee_profile_exists(
 returns boolean
 language sql
 security definer
-set search_path = public, auth
+set search_path = public
 as $$
   select exists (
     select 1
@@ -100,29 +105,21 @@ as $$
 $$;
 
 create or replace function public.create_employee_profile(
-  p_user_id uuid,
   p_employee_id text,
   p_full_name text,
   p_mobile_number text,
   p_email text default null,
+  p_password text default null,
   p_terms_accepted boolean default true
 )
 returns setof public.employee_profiles
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public
 as $$
 declare
   v_profile public.employee_profiles%rowtype;
 begin
-  if p_user_id is null then
-    raise exception 'User id is required';
-  end if;
-
-  if not exists (select 1 from auth.users where id = p_user_id) then
-    raise exception 'Auth user does not exist';
-  end if;
-
   if nullif(trim(p_employee_id), '') is null then
     raise exception 'Employee ID is required';
   end if;
@@ -135,30 +132,35 @@ begin
     raise exception 'Mobile Number is required';
   end if;
 
+  if nullif(p_password, '') is null then
+    raise exception 'Password is required';
+  end if;
+
+  if length(p_password) < 8 then
+    raise exception 'Password must be at least 8 characters';
+  end if;
+
   if p_terms_accepted is not true then
     raise exception 'Terms must be accepted';
   end if;
 
   if exists (
     select 1 from public.employee_profiles
-    where user_id <> p_user_id
-      and lower(employee_id) = lower(trim(p_employee_id))
+    where lower(employee_id) = lower(trim(p_employee_id))
   ) then
     raise exception 'Employee ID already registered';
   end if;
 
   if exists (
     select 1 from public.employee_profiles
-    where user_id <> p_user_id
-      and mobile_number = trim(p_mobile_number)
+    where mobile_number = trim(p_mobile_number)
   ) then
     raise exception 'Phone number already registered';
   end if;
 
-  if p_email is not null and exists (
+  if nullif(trim(coalesce(p_email, '')), '') is not null and exists (
     select 1 from public.employee_profiles
-    where user_id <> p_user_id
-      and lower(email) = lower(trim(p_email))
+    where lower(email) = lower(trim(p_email))
   ) then
     raise exception 'Email already registered';
   end if;
@@ -169,31 +171,67 @@ begin
     full_name,
     mobile_number,
     email,
+    password_hash,
     terms_accepted,
     terms_accepted_at,
     is_phone_verified,
     user_type
   )
   values (
-    p_user_id,
+    gen_random_uuid(),
     trim(p_employee_id),
     trim(p_full_name),
     trim(p_mobile_number),
-    nullif(lower(trim(p_email)), ''),
+    nullif(lower(trim(coalesce(p_email, ''))), ''),
+    extensions.crypt(p_password, extensions.gen_salt('bf')),
     true,
     timezone('utc', now()),
     false,
     'employee'
   )
-  on conflict (user_id) do update
-  set employee_id = excluded.employee_id,
-      full_name = excluded.full_name,
-      mobile_number = excluded.mobile_number,
-      email = excluded.email,
-      terms_accepted = excluded.terms_accepted,
-      terms_accepted_at = excluded.terms_accepted_at,
-      user_type = 'employee'
   returning * into v_profile;
+
+  return next v_profile;
+end;
+$$;
+
+create or replace function public.login_employee(
+  p_mobile_number text default null,
+  p_email text default null,
+  p_password text default null
+)
+returns setof public.employee_profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_profile public.employee_profiles%rowtype;
+begin
+  if nullif(p_password, '') is null then
+    raise exception 'Password is required';
+  end if;
+
+  select *
+  into v_profile
+  from public.employee_profiles ep
+  where (
+      p_mobile_number is not null
+      and ep.mobile_number = trim(p_mobile_number)
+    )
+    or (
+      p_email is not null
+      and lower(ep.email) = lower(trim(p_email))
+    )
+  limit 1;
+
+  if v_profile.id is null or v_profile.password_hash is null then
+    raise exception 'Invalid login credentials';
+  end if;
+
+  if v_profile.password_hash <> extensions.crypt(p_password, v_profile.password_hash) then
+    raise exception 'Invalid login credentials';
+  end if;
 
   return next v_profile;
 end;
@@ -202,20 +240,27 @@ $$;
 alter table public.employee_profiles enable row level security;
 alter table public.verification_codes enable row level security;
 
-drop policy if exists "Employees can read own profile" on public.employee_profiles;
-create policy "Employees can read own profile"
+drop policy if exists "Development can create employee profiles" on public.employee_profiles;
+create policy "Development can create employee profiles"
+on public.employee_profiles
+for insert
+to anon, authenticated
+with check (true);
+
+drop policy if exists "Development can read employee profiles" on public.employee_profiles;
+create policy "Development can read employee profiles"
 on public.employee_profiles
 for select
-to authenticated
-using (auth.uid() = user_id);
+to anon, authenticated
+using (true);
 
-drop policy if exists "Employees can update own profile" on public.employee_profiles;
-create policy "Employees can update own profile"
+drop policy if exists "Development can update employee profiles" on public.employee_profiles;
+create policy "Development can update employee profiles"
 on public.employee_profiles
 for update
-to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+to anon, authenticated
+using (true)
+with check (true);
 
 drop policy if exists "No direct verification code access" on public.verification_codes;
 create policy "No direct verification code access"
@@ -225,13 +270,15 @@ using (false)
 with check (false);
 
 grant usage on schema public to anon, authenticated;
-grant select, update on public.employee_profiles to authenticated;
+grant select, insert, update on public.employee_profiles to anon, authenticated;
 grant execute on function public.employee_profile_exists(text, text, text)
   to anon, authenticated;
 grant execute on function public.create_employee_profile(
-  uuid, text, text, text, text, boolean
+  text, text, text, text, text, boolean
 ) to anon, authenticated;
+grant execute on function public.login_employee(text, text, text)
+  to anon, authenticated;
 
--- Required manual Auth setting:
--- Supabase Dashboard -> Authentication -> Sign In / Providers -> Email:
--- Keep Email provider enabled and disable email confirmation while verification is ignored.
+-- Manual Supabase Auth setting:
+-- No Auth provider is required for this employee development flow.
+-- This is intentionally table-backed and should be replaced before production.

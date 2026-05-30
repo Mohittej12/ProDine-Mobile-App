@@ -26,6 +26,18 @@ class EmployeeSignupRequest {
   }
 }
 
+class EmployeeLoginRequest {
+  final String? email;
+  final String? mobileNumber;
+  final String password;
+
+  EmployeeLoginRequest({
+    this.email,
+    this.mobileNumber,
+    required this.password,
+  });
+}
+
 class EmployeeProfile {
   final String id;
   final String userId;
