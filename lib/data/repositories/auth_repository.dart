@@ -113,6 +113,33 @@ class AuthRepository {
     }
   }
 
+  Future<bool> changeEmployeePassword({
+    String? email,
+    String? mobileNumber,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final normalizedPhone =
+          mobileNumber == null ? null : _toInternationalPhone(mobileNumber);
+
+      final response = await _supabaseService.client.rpc(
+        'change_employee_password',
+        params: {
+          'p_current_password': currentPassword,
+          'p_new_password': newPassword,
+          'p_mobile_number': normalizedPhone,
+          'p_email': email?.toLowerCase(),
+        },
+      );
+
+      return response == true;
+    } catch (e) {
+      print('Employee change password error: $e');
+      rethrow;
+    }
+  }
+
   Future<bool> verifyEmployeePhone({
     required String phoneNumber,
     required String otpCode,
@@ -151,6 +178,42 @@ class AuthRepository {
       return EmployeeProfile.fromJson(response);
     } catch (e) {
       print('Get employee profile error: $e');
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteEmployeeAccount({
+    String? userId,
+    String? mobileNumber,
+    String? email,
+    String? employeeId,
+  }) async {
+    try {
+      final trimmedUserId = userId?.trim();
+      final trimmedMobile = mobileNumber?.trim();
+      final trimmedEmail = email?.trim().toLowerCase();
+      final trimmedEmployeeId = employeeId?.trim();
+
+      if ((trimmedUserId == null || trimmedUserId.isEmpty) &&
+          (trimmedMobile == null || trimmedMobile.isEmpty) &&
+          (trimmedEmail == null || trimmedEmail.isEmpty) &&
+          (trimmedEmployeeId == null || trimmedEmployeeId.isEmpty)) {
+        throw Exception('No authenticated employee identifier found.');
+      }
+
+      final response = await _supabaseService.client.rpc(
+        'delete_employee_profile',
+        params: {
+          'p_user_id': trimmedUserId,
+          'p_mobile_number': trimmedMobile,
+          'p_email': trimmedEmail,
+          'p_employee_id': trimmedEmployeeId,
+        },
+      );
+
+      return response == true;
+    } catch (e) {
+      print('Delete employee account error: $e');
       rethrow;
     }
   }
@@ -233,5 +296,65 @@ class AuthRepository {
   String _authEmailForPhone(String phone) {
     final digits = phone.replaceAll(RegExp(r'[^0-9]'), '');
     return 'employee_$digits@prodine.local';
+  }
+
+  // ========== Admin Login ==========
+
+  Future<Map<String, dynamic>> loginAdmin({
+    String? email,
+    String? mobileNumber,
+    required String password,
+  }) async {
+    try {
+      final normalizedPhone =
+          mobileNumber == null ? null : _toInternationalPhone(mobileNumber);
+
+      final profileResponse = await _supabaseService.client
+          .rpc(
+            'login_admin',
+            params: {
+              'p_mobile_number': normalizedPhone,
+              'p_email': email?.toLowerCase(),
+              'p_password': password,
+            },
+          )
+          .select()
+          .single();
+
+      return profileResponse as Map<String, dynamic>;
+    } catch (e) {
+      print('Admin login error: $e');
+      rethrow;
+    }
+  }
+
+  // ========== Vendor Login ==========
+
+  Future<Map<String, dynamic>> loginVendor({
+    String? email,
+    String? mobileNumber,
+    required String password,
+  }) async {
+    try {
+      final normalizedPhone =
+          mobileNumber == null ? null : _toInternationalPhone(mobileNumber);
+
+      final profileResponse = await _supabaseService.client
+          .rpc(
+            'login_vendor',
+            params: {
+              'p_mobile_number': normalizedPhone,
+              'p_email': email?.toLowerCase(),
+              'p_password': password,
+            },
+          )
+          .select()
+          .single();
+
+      return profileResponse as Map<String, dynamic>;
+    } catch (e) {
+      print('Vendor login error: $e');
+      rethrow;
+    }
   }
 }

@@ -37,6 +37,8 @@ import 'package:pro_dine/features/vendor/pages/vendor_edit_food_page.dart';
 import 'package:pro_dine/features/vendor/pages/vendor_food_items_page.dart';
 import 'package:pro_dine/features/vendor/pages/vendor_food_portions_page.dart';
 import 'package:pro_dine/features/vendor/pages/vendor_orders_page.dart';
+import 'package:pro_dine/features/auth/pages/admin_login_page.dart';
+import 'package:pro_dine/features/auth/pages/vendor_login_page.dart';
 import 'package:pro_dine/features/vendor/pages/vendor_reports_page.dart';
 import 'package:pro_dine/features/vendor/pages/vendor_terms_page.dart';
 import 'package:pro_dine/features/vendor/pages/vendor_ticket_data_page.dart';
@@ -125,6 +127,20 @@ final GoRouter appRouter = GoRouter(
           state: state,
         );
       },
+    ),
+    GoRoute(
+      path: AppRoutes.vendorLogin,
+      pageBuilder: (context, state) => _buildTransitionPage(
+        child: const VendorLoginPage(),
+        state: state,
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.adminLogin,
+      pageBuilder: (context, state) => _buildTransitionPage(
+        child: const AdminLoginPage(),
+        state: state,
+      ),
     ),
     // Employee Auth
     GoRoute(

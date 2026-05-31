@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pro_dine/core/constants/app_routes.dart';
 import 'package:pro_dine/core/widgets/app_logo.dart';
+import 'package:pro_dine/data/repositories/auth_repository.dart';
 import 'package:pro_dine/features/employee/data/employee_profile_store.dart';
 import 'package:pro_dine/features/employee/data/employee_order_store.dart';
 
@@ -84,6 +85,26 @@ class _EmployeeProfileFragmentState extends State<EmployeeProfileFragment> {
   }
 
   void _showComingSoon(String label) {
+    if (label == 'Help & Support') {
+      showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Help & Support'),
+          content: const Text(
+            'For development and upgradations, do contact +91 7382260206 G. Mohit Tej.\n\n'
+            'For office related queries, kindly contact the Admin Team.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -161,6 +182,56 @@ class _EmployeeProfileFragmentState extends State<EmployeeProfileFragment> {
           ),
         ),
       );
+  }
+
+  Future<void> _confirmDeleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Account Permanently'),
+        content: const Text(
+          'If you click this button whole data will be deleted.\n\n'
+          'Do you want to continue?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _EmployeeProfileFragmentState._primaryRed,
+            ),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      final authRepository = AuthRepository();
+      await authRepository.deleteEmployeeAccount(
+        employeeId: EmployeeProfileStore.instance.value.employeeId,
+      );
+      await authRepository.signOut();
+      if (!mounted) return;
+      context.go(AppRoutes.login);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              'Unable to delete account. Please try again.',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        );
+    }
   }
 
   Future<void> _confirmLogout() async {
@@ -368,6 +439,11 @@ class _MobileProfileBody extends StatelessWidget {
         ),
         SizedBox(height: layout.cardGap + 6),
         _LogoutButton(layout: layout, onTap: state._confirmLogout),
+        const SizedBox(height: 12),
+        _DeleteAccountButton(
+          layout: layout,
+          onTap: state._confirmDeleteAccount,
+        ),
       ],
     );
   }
@@ -398,6 +474,11 @@ class _DesktopProfileBody extends StatelessWidget {
               ),
               SizedBox(height: layout.cardGap),
               _LogoutButton(layout: layout, onTap: state._confirmLogout),
+              const SizedBox(height: 12),
+              _DeleteAccountButton(
+                layout: layout,
+                onTap: state._confirmDeleteAccount,
+              ),
             ],
           ),
         ),
@@ -938,6 +1019,49 @@ class _LogoutButton extends StatelessWidget {
         ),
         child: Text(
           'Logout',
+          style: TextStyle(
+            color: _EmployeeProfileFragmentState._primaryRed,
+            fontSize: layout.isDesktop ? 15.5 : 14 * scale,
+            height: 1,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteAccountButton extends StatelessWidget {
+  const _DeleteAccountButton({required this.layout, required this.onTap});
+
+  final _ProfileLayout layout;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = layout.scale;
+
+    return SizedBox(
+      width: double.infinity,
+      height: layout.isDesktop ? 58 : 52 * scale,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _EmployeeProfileFragmentState._primaryRed,
+          side: BorderSide(
+            color: _EmployeeProfileFragmentState._primaryRed.withValues(
+              alpha: 0.35,
+            ),
+            width: 1.2,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(17 * scale),
+          ),
+          backgroundColor: Colors.white.withOpacity(0.65),
+        ),
+        child: Text(
+          'Delete Account Permanently',
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: _EmployeeProfileFragmentState._primaryRed,
             fontSize: layout.isDesktop ? 15.5 : 14 * scale,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pro_dine/data/repositories/auth_repository.dart';
 import 'package:pro_dine/data/models/employee_model.dart';
+import 'package:pro_dine/features/employee/data/employee_profile_store.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum AuthStep {
@@ -76,6 +77,7 @@ class EmployeeAuthProvider extends ChangeNotifier {
       );
       _currentUser = null;
       _employeeProfile = profile;
+      _syncProfileToStore(profile);
       _currentStep = AuthStep.verified;
       notifyListeners();
     } catch (e) {
@@ -157,6 +159,7 @@ class EmployeeAuthProvider extends ChangeNotifier {
 
       _currentUser = null;
       _employeeProfile = profile;
+      _syncProfileToStore(profile);
 
       _currentStep = AuthStep.login;
       _errorMessage = 'Account created successfully! Please login.';
@@ -254,10 +257,23 @@ class EmployeeAuthProvider extends ChangeNotifier {
       if (_currentUser == null) return;
       _employeeProfile =
           await _authRepository.getEmployeeProfile(_currentUser!.id);
+      if (_employeeProfile != null) {
+        _syncProfileToStore(_employeeProfile!);
+      }
       notifyListeners();
     } catch (e) {
       print('Load employee profile error: $e');
     }
+  }
+
+  void _syncProfileToStore(EmployeeProfile profile) {
+    EmployeeProfileStore.instance.update(
+      EmployeeProfileData(
+        name: profile.fullName,
+        phone: profile.mobileNumber,
+        employeeId: profile.employeeId,
+      ),
+    );
   }
 
   Future<void> signOut() async {
@@ -268,6 +284,13 @@ class EmployeeAuthProvider extends ChangeNotifier {
       await _authRepository.signOut();
       _currentUser = null;
       _employeeProfile = null;
+      EmployeeProfileStore.instance.update(
+        const EmployeeProfileData(
+          name: 'Sarah',
+          phone: '+91 98765 43210',
+          employeeId: 'PD-2048',
+        ),
+      );
       _currentStep = AuthStep.login;
       _clearSignupForm();
       notifyListeners();

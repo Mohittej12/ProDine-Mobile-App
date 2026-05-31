@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pro_dine/core/widgets/app_logo.dart';
 import 'package:pro_dine/features/employee/data/employee_order_store.dart';
+import 'package:pro_dine/features/employee/data/employee_profile_store.dart';
 
 class EmployeeOrdersFragment extends StatefulWidget {
   const EmployeeOrdersFragment({super.key});
@@ -39,6 +40,7 @@ class _EmployeeOrdersFragmentState extends State<EmployeeOrdersFragment>
     _activeScrollController.addListener(_syncHeaderScrollState);
     _historyScrollController.addListener(_syncHeaderScrollState);
     _orderStore.addListener(_onOrdersUpdated);
+    _loadOrders();
   }
 
   @override
@@ -143,10 +145,23 @@ class _EmployeeOrdersFragmentState extends State<EmployeeOrdersFragment>
 
   Future<void> _refreshOrders() async {
     HapticFeedback.lightImpact();
-    await Future<void>.delayed(const Duration(milliseconds: 700));
+    await _loadOrders();
     if (!mounted) return;
     setState(() {});
     HapticFeedback.selectionClick();
+  }
+
+  Future<void> _loadOrders() async {
+    final employeeId = EmployeeProfileStore.instance.value.employeeId;
+    if (employeeId.isEmpty || employeeId == 'PD-2048') {
+      return;
+    }
+
+    try {
+      await _orderStore.loadOrdersForEmployee(employeeId);
+    } catch (e) {
+      debugPrint('Failed to load orders for $employeeId: $e');
+    }
   }
 
   @override

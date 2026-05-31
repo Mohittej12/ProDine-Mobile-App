@@ -46,13 +46,13 @@ class _EmployeeMealAuthorizationPageState
     super.dispose();
   }
 
-  void _submitRequest() {
+  void _submitRequest() async {
     final profile = EmployeeProfileStore.instance.value;
     final orderIntent =
         isOffTicket ? 'Ticketing-Off Ticket' : 'Ticketing-Ticket ID';
     final order = EmployeeOrderEntry(
       orderId: _generateOrderId(),
-      employeeId: _formatEmployeeId(profile.employeeId),
+      employeeId: profile.employeeId,
       userName: profile.name,
       shopId: 'MEAL_COUNTER',
       shopName: 'Meal Counter',
@@ -73,9 +73,25 @@ class _EmployeeMealAuthorizationPageState
       createdAt: DateTime.now(),
     );
 
-    EmployeeOrderStore.instance.addOrder(order);
-    if (!mounted) return;
-    context.pushReplacement(AppRoutes.employeeOrders);
+    try {
+      await EmployeeOrderStore.instance.saveOrder(order);
+      if (!mounted) return;
+      context.pushReplacement(AppRoutes.employeeOrders);
+    } catch (e, stackTrace) {
+      debugPrint('Ticketing order save failed: $e');
+      debugPrint('$stackTrace');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Unable to raise order: ${e.toString()}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
+      }
+    }
   }
 
   static String _generateOrderId() {

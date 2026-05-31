@@ -11,7 +11,12 @@ class AppRoutes {
   // Employee Auth
   static const String employeeLogin = '/employee-login';
   static const String employeeSignup = '/employee-signup';
-  static const String employeePhoneVerification = '/employee-phone-verification';
+  static const String employeePhoneVerification =
+      '/employee-phone-verification';
+
+  // Vendor/Admin Auth
+  static const String vendorLogin = '/vendor-login';
+  static const String adminLogin = '/admin-login';
 
   // Employee
   static const String employeeModeSelection = '/employee/mode-selection';

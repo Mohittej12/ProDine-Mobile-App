@@ -4,9 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:pro_dine/core/constants/app_colors.dart';
 import 'package:pro_dine/core/constants/app_routes.dart';
 import 'package:pro_dine/core/services/providers/employee_auth_provider.dart';
+import 'package:pro_dine/core/services/providers/auth_provider.dart';
 import 'package:pro_dine/core/widgets/app_button.dart';
 import 'package:pro_dine/core/widgets/app_text_field.dart';
 import 'package:pro_dine/features/employee/data/employee_cart_store.dart';
+import 'package:pro_dine/features/employee/data/employee_profile_store.dart';
+import 'package:pro_dine/data/repositories/auth_repository.dart';
 import 'package:provider/provider.dart';
 
 class AuthLoginPage extends StatefulWidget {
@@ -72,13 +75,60 @@ class _AuthLoginPageState extends State<AuthLoginPage> {
     String mobileNumber,
     String password,
   ) async {
-    if (_isVendor) {
-      context.push(AppRoutes.vendorDashboard);
-      return;
-    }
+    final authRepo = AuthRepository();
 
-    if (_isAdmin) {
-      context.push(AppRoutes.adminDashboard);
+    // Vendor/Admin: Detect if the submitted credentials are employee credentials.
+    if (_isVendor || _isAdmin) {
+      try {
+        await authProvider.loginEmployee(
+          mobileNumber: mobileNumber,
+          password: password,
+        );
+
+        if (!mounted) return;
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Credentials Conflict'),
+            content: const Text(
+              'Don\'t use the same credentials which you used in the employee side.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      } catch (_) {
+        // Not employee credentials. Continue to admin/vendor validation.
+      }
+
+      if (!mounted) return;
+      try {
+        if (_isVendor) {
+          await authRepo.loginVendor(
+            mobileNumber: mobileNumber,
+            password: password,
+          );
+          context.go(AppRoutes.vendorDashboard);
+        } else if (_isAdmin) {
+          await authRepo.loginAdmin(
+            mobileNumber: mobileNumber,
+            password: password,
+          );
+          context.go(AppRoutes.adminDashboard);
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid admin/vendor credentials'),
+          ),
+        );
+      }
       return;
     }
 

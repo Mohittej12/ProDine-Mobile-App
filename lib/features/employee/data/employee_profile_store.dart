@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pro_dine/data/repositories/auth_repository.dart';
 
 class EmployeeProfileData {
   const EmployeeProfileData({
@@ -27,17 +27,16 @@ class EmployeeProfileData {
 
 class EmployeeProfileStore extends ValueNotifier<EmployeeProfileData> {
   EmployeeProfileStore._()
-    : super(
-        const EmployeeProfileData(
-          name: 'Sarah',
-          phone: '+91 98765 43210',
-          employeeId: 'PD-2048',
-        ),
-      );
+      : super(
+          const EmployeeProfileData(
+            name: 'Sarah',
+            phone: '+91 98765 43210',
+            employeeId: 'PD-2048',
+          ),
+        );
 
   static final EmployeeProfileStore instance = EmployeeProfileStore._();
-  static const String _passwordKey = 'employee_profile_password';
-  static const String _defaultPassword = 'password123';
+  final AuthRepository _authRepository = AuthRepository();
 
   void update(EmployeeProfileData profile) {
     value = profile;
@@ -47,12 +46,18 @@ class EmployeeProfileStore extends ValueNotifier<EmployeeProfileData> {
     required String currentPassword,
     required String newPassword,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedPassword = prefs.getString(_passwordKey) ?? _defaultPassword;
-
-    if (currentPassword != savedPassword) return false;
-
-    await prefs.setString(_passwordKey, newPassword);
-    return true;
+    try {
+      return await _authRepository.changeEmployeePassword(
+        mobileNumber: value.phone,
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+    } catch (e) {
+      if (e.toString().contains('Invalid login credentials') ||
+          e.toString().contains('Invalid credentials')) {
+        return false;
+      }
+      rethrow;
+    }
   }
 }

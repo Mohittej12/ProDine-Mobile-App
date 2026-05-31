@@ -18,7 +18,7 @@ void main() async {
     print('🔐 Validating Supabase config...');
     SupabaseConfig.validate();
     print('✅ Supabase config is valid');
-    
+
     print('🌐 Initializing Supabase client...');
     await SupabaseService().initialize(
       SupabaseConfig.supabaseUrl,

@@ -51,11 +51,15 @@ class EmployeeCheckoutPage extends StatelessWidget {
                       child: layout.isDesktop
                           ? _DesktopCheckoutBody(
                               layout: layout,
-                              onPayNow: () => _placeOrder(context),
+                              onPayNow: () {
+                                _placeOrder(context);
+                              },
                             )
                           : _MobileCheckoutBody(
                               layout: layout,
-                              onPayNow: () => _placeOrder(context),
+                              onPayNow: () {
+                                _placeOrder(context);
+                              },
                             ),
                     ),
                   ),
@@ -68,7 +72,7 @@ class EmployeeCheckoutPage extends StatelessWidget {
     );
   }
 
-  void _placeOrder(BuildContext context) {
+  Future<void> _placeOrder(BuildContext context) async {
     final cartItems = EmployeeCartStore.instance.items;
     if (cartItems.isEmpty) return;
 
@@ -81,11 +85,10 @@ class EmployeeCheckoutPage extends StatelessWidget {
     );
     final isTicketing = EmployeeCartStore.instance.isTicketingMode;
     final orderId = _generateOrderId();
-    final employeeId = _formatEmployeeId(profile.employeeId);
 
     final order = EmployeeOrderEntry(
       orderId: orderId,
-      employeeId: employeeId,
+      employeeId: profile.employeeId,
       userName: profile.name,
       shopId: shopName == 'Meal Counter' ? 'MEAL_COUNTER' : 'TUCK_SHOP',
       shopName: shopName,
@@ -108,12 +111,30 @@ class EmployeeCheckoutPage extends StatelessWidget {
       createdAt: DateTime.now(),
     );
 
-    EmployeeOrderStore.instance.addOrder(order);
-    EmployeeCartStore.instance.clear();
-    context.pushReplacement(
-      AppRoutes.employeePaymentStatus,
-      extra: order,
-    );
+    try {
+      await EmployeeOrderStore.instance.saveOrder(order);
+      EmployeeCartStore.instance.clear();
+      if (context.mounted) {
+        context.pushReplacement(
+          AppRoutes.employeePaymentStatus,
+          extra: order,
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Order save failed: $e');
+      debugPrint('$stackTrace');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Unable to place order: ${e.toString()}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
+      }
+    }
   }
 }
 
