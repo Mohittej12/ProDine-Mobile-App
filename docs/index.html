@@ -108,7 +108,6 @@
       background: #0f2549;
       color: #fff;
       z-index: 9999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     .loader-overlay.loaded {
       opacity: 0;
@@ -575,8 +574,7 @@
 
     function finishLoader() {
       if (!loader) return;
-      loader.classList.add('loaded');
-      setTimeout(() => loader.remove(), 600);
+      loader.remove();
     }
 
     setTimeout(finishLoader, transitionDuration);
