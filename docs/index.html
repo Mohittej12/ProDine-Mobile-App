@@ -95,6 +95,50 @@
       min-height: 100vh;
       padding: 20px;
       color: #333;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: #0f2549;
+      color: #fff;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .loader-overlay.loaded {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-ring {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 5px solid rgba(255,255,255,0.12);
+      border-top-color: #ffd93d;
+      animation: spin 1.2s linear infinite;
+      box-shadow: 0 0 20px rgba(255,217,61,0.25);
+    }
+    .loader-title {
+      margin-top: 24px;
+      font-size: 1.8rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ffd93d;
+      animation: fadeInDown 0.8s ease-out both;
+    }
+    .loader-subtitle {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #e5e5ff;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     .container { max-width: 920px; margin: 0 auto; padding: 0 20px; }
     .nav-bar {
@@ -414,6 +458,11 @@
   </style>
 </head>
 <body>
+  <div class="loader-overlay">
+    <div class="loader-ring"></div>
+    <div class="loader-title">ProDine</div>
+    <div class="loader-subtitle">Preparing your experience...</div>
+  </div>
   <div class="container">
     <div class="logo-section">
       <img src="../assets/images/app_logo.png" alt="ProDine Logo" class="logo" onerror="this.src='../assets/images/app_icon.png'" />
@@ -491,5 +540,13 @@
       <p>ProDine © 2026 | <a href="https://github.com/Mohittej12/ProDine-Mobile-App">View on GitHub</a> | Made with ❤️ for restaurant owners</p>
     </div>
   </div>
+  <script>
+    window.addEventListener('load', function() {
+      const loader = document.querySelector('.loader-overlay');
+      if (!loader) return;
+      loader.classList.add('loaded');
+      setTimeout(() => loader.remove(), 600);
+    });
+  </script>
 </body>
 </html>
