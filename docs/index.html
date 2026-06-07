@@ -91,7 +91,7 @@
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7aa8d1 100%);
+      background: #0f2549;
       min-height: 100vh;
       padding: 20px;
       color: #333;
@@ -674,6 +674,15 @@
     }
 
     setTimeout(finishLoader, transitionDuration);
+
+    const surveyForm = document.querySelector('.survey-form');
+    if (surveyForm) {
+      surveyForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        alert('Thank you for your feedback!');
+        surveyForm.reset();
+      });
+    }
   </script>
 </body>
 </html>
