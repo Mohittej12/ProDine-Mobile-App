@@ -570,9 +570,8 @@
     </div>
   </div>
   <script>
-    const startTime = performance.now();
     const loader = document.querySelector('.loader-overlay');
-    const minDuration = 3000;
+    const transitionDuration = 3000;
 
     function finishLoader() {
       if (!loader) return;
@@ -580,11 +579,7 @@
       setTimeout(() => loader.remove(), 600);
     }
 
-    window.addEventListener('load', function() {
-      const elapsed = performance.now() - startTime;
-      const remaining = Math.max(0, minDuration - elapsed);
-      setTimeout(finishLoader, remaining);
-    });
+    setTimeout(finishLoader, transitionDuration);
   </script>
 </body>
 </html>
