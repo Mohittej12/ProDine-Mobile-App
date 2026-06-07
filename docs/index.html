@@ -6,186 +6,291 @@
   <title>ProDine - Restaurant Management App</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #0f3620 100%);
       min-height: 100vh;
       padding: 20px;
+      color: #333;
     }
-    .container { max-width: 700px; margin: 0 auto; }
-    .header {
+    .container { max-width: 800px; margin: 0 auto; }
+    .nav-bar {
       text-align: center;
-      padding: 40px 20px;
+      padding: 20px 0;
       color: #fff;
     }
+    .logo-section {
+      text-align: center;
+      background: #fff;
+      padding: 40px 20px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
     .logo {
-      max-width: 120px;
+      max-width: 150px;
       height: auto;
       margin-bottom: 20px;
       display: inline-block;
     }
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      font-size: 3rem;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 25%, #f06c50 50%, #f08b3d 75%, #ffb638 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      font-weight: 800;
     }
     .tagline {
-      font-size: 1.1rem;
-      opacity: 0.95;
-      margin-bottom: 40px;
+      font-size: 1.2rem;
+      color: #2d5a3d;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: #666;
     }
     .card {
       background: #fff;
-      border-radius: 16px;
-      padding: 30px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .info-section {
+      border-radius: 20px;
+      padding: 40px;
       margin-bottom: 25px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      border-top: 6px solid #ff6b6b;
     }
-    .info-section h2 {
-      color: #667eea;
-      font-size: 1.3rem;
-      margin-bottom: 12px;
+    .card.feature-card {
+      border-top: 6px solid #4ecdc4;
     }
-    .info-section p {
+    .card.contact-card {
+      border-top: 6px solid #ffd93d;
+    }
+    .section-title {
+      font-size: 1.8rem;
+      color: #2d5a3d;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: '';
+      width: 5px;
+      height: 30px;
+      background: linear-gradient(135deg, #ff6b6b, #ffb638);
+      border-radius: 3px;
+    }
+    .description {
       color: #555;
-      line-height: 1.6;
-      font-size: 1rem;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
     }
     .features {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin: 20px 0;
+      gap: 20px;
+      margin: 25px 0;
     }
     .feature {
-      background: #f0f4ff;
-      padding: 12px;
-      border-radius: 8px;
-      border-left: 4px solid #667eea;
-    }
-    .feature strong { color: #667eea; }
-    .download-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      padding: 16px 40px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin: 20px 0;
-      transition: transform 0.3s, box-shadow 0.3s;
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-    .download-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
-    }
-    .contact-section {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      padding: 25px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+      padding: 20px;
       border-radius: 12px;
-      margin-top: 25px;
+      border-left: 5px solid #4ecdc4;
+      transition: transform 0.3s;
     }
-    .contact-section h3 {
-      font-size: 1.3rem;
-      margin-bottom: 15px;
+    .feature:hover {
+      transform: translateY(-5px);
     }
-    .contact-item {
-      margin: 12px 0;
-      font-size: 1rem;
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
     }
-    .contact-item strong { font-weight: 600; }
-    .highlight {
-      background: rgba(255,255,255,0.2);
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 10px;
-      border-left: 3px solid #fff;
+    .feature strong { 
+      color: #2d5a3d;
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 8px;
     }
-    .survey-text {
+    .feature p {
       color: #666;
       font-size: 0.95rem;
-      margin-top: 15px;
-      line-height: 1.5;
     }
-    .badge {
+    .download-section {
+      text-align: center;
+      margin: 35px 0;
+    }
+    .download-btn {
       display: inline-block;
-      background: #667eea;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #ff8a65 100%);
       color: #fff;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      margin-right: 8px;
+      padding: 18px 50px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.35);
+      cursor: pointer;
+      border: none;
+    }
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5);
+    }
+    .download-info {
+      color: #999;
+      font-size: 0.95rem;
+      margin-top: 12px;
+    }
+    .survey-section {
+      background: linear-gradient(135deg, #f5f7fa 0%, #fffbf0 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 25px 0;
+      border-left: 5px solid #ffd93d;
+    }
+    .survey-text {
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .contact-card {
+      background: linear-gradient(135deg, #2d5a3d 0%, #1a472a 50%, #0f3620 100%);
+      color: #fff;
+    }
+    .contact-card .section-title {
+      color: #fff;
+    }
+    .contact-item {
+      margin: 18px 0;
+      font-size: 1.05rem;
+      padding: 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+    .contact-item strong { 
+      font-weight: 600;
+      color: #ffd93d;
+    }
+    .contact-value {
+      color: #ffb638;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .highlight-box {
+      background: rgba(255, 217, 61, 0.15);
+      border-left: 4px solid #ffd93d;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 15px;
+      color: #fff;
+    }
+    .highlight-box strong {
+      color: #ffd93d;
+    }
+    .footer {
+      text-align: center;
+      color: #fff;
+      margin-top: 40px;
+      padding: 20px;
+      opacity: 0.9;
+    }
+    .footer a {
+      color: #ffd93d;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      .section-title { font-size: 1.4rem; }
+      .features { grid-template-columns: 1fr; }
+      .card { padding: 25px; }
+      .download-btn { font-size: 1rem; padding: 14px 35px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="logo-section">
       <img src="../assets/images/brand_logo.png" alt="ProDine Logo" class="logo" />
       <h1>ProDine</h1>
       <p class="tagline">Smart Restaurant & Food Provider Management</p>
+      <p class="subtitle">Streamline your restaurant operations with advanced ordering and menu management</p>
     </div>
 
     <div class="card">
-      <div class="info-section">
-        <h2>📱 What is ProDine?</h2>
-        <p>ProDine is a comprehensive mobile application designed for restaurants and food providers to manage menus, orders, and delivery operations efficiently. Whether you're running a small café or a large restaurant, ProDine streamlines your business with powerful tools and intuitive design.</p>
-      </div>
+      <div class="section-title">About ProDine</div>
+      <p class="description">
+        ProDine is a cutting-edge mobile application designed to revolutionize how restaurants and food providers operate. From small cafés to large restaurant chains, ProDine provides powerful tools to manage menus, track orders in real-time, and streamline your entire food service business. Our intuitive interface and robust features make restaurant management effortless.
+      </p>
+    </div>
 
-      <div class="info-section">
-        <h2>⭐ Key Features</h2>
-        <div class="features">
-          <div class="feature">
-            <strong>📋 Menu Management</strong>
-            <p>Easy CRUD operations for food items</p>
-          </div>
-          <div class="feature">
-            <strong>📦 Order Tracking</strong>
-            <p>Real-time order status updates</p>
-          </div>
-          <div class="feature">
-            <strong>👤 Vendor Dashboard</strong>
-            <p>Role-based access control</p>
-          </div>
-          <div class="feature">
-            <strong>🔗 Deep Links</strong>
-            <p>Seamless app integration</p>
-          </div>
+    <div class="card feature-card">
+      <div class="section-title">Key Features</div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">📋</div>
+          <strong>Menu Management</strong>
+          <p>Create, edit, and organize food items with rich descriptions and pricing</p>
         </div>
-      </div>
-
-      <div style="text-align: center;">
-        <a href="https://github.com/Mohittej12/ProDine-Mobile-App/releases/download/v1.0.0/app-release.apk" class="download-btn">⬇️ Download APK (v1.0.0)</a>
-        <p style="color: #999; font-size: 0.9rem; margin-top: 10px;">Size: ~68 MB | Requires Android 5.0+</p>
-      </div>
-
-      <div class="survey-text">
-        We'd love to hear from you! Have suggestions, found bugs, or want to suggest improvements? Your feedback helps us build a better app.
-      </div>
-
-      <div class="contact-section">
-        <h3>📞 Get in Touch & Provide Feedback</h3>
-        <div class="contact-item">
-          <strong>📧 Email:</strong> <span style="color: #ffd700;">mohittejgowraa@gmail.com</span>
+        <div class="feature">
+          <div class="feature-icon">📦</div>
+          <strong>Order Tracking</strong>
+          <p>Real-time order status updates and delivery management</p>
         </div>
-        <div class="contact-item">
-          <strong>📱 Phone:</strong> <span style="color: #ffd700;">+91 7382260206</span>
+        <div class="feature">
+          <div class="feature-icon">👤</div>
+          <strong>Vendor Dashboard</strong>
+          <p>Comprehensive analytics and role-based access control</p>
         </div>
-        <div class="highlight">
-          <strong>⚡ Report Issues & Send Suggestions</strong><br>
-          Have a development issue, bug report, or feature suggestion? Contact us using the details above. We respond quickly and value your input!
+        <div class="feature">
+          <div class="feature-icon">🔗</div>
+          <strong>Deep Links</strong>
+          <p>Seamless integration and direct app navigation</p>
         </div>
       </div>
     </div>
 
-    <div style="text-align: center; color: #fff; margin-top: 30px; font-size: 0.9rem;">
-      <p>ProDine © 2026 | <a href="https://github.com/Mohittej12/ProDine-Mobile-App" style="color: #ffd700;">View on GitHub</a></p>
+    <div class="card">
+      <div class="download-section">
+        <div class="section-title">Download Now</div>
+        <a href="https://github.com/Mohittej12/ProDine-Mobile-App/releases/download/v1.0.0/app-release.apk" class="download-btn">⬇️ Download APK (v1.0.0)</a>
+        <p class="download-info">📱 Size: ~68 MB | ⚙️ Requires Android 5.0+ | 🆓 Free to download and use</p>
+      </div>
+
+      <div class="survey-section">
+        <div class="survey-text">
+          <strong>💬 Help Us Improve!</strong><br><br>
+          We're constantly working to make ProDine better. Have you found a bug? Do you have suggestions for new features? Your feedback is invaluable and helps us deliver an even better experience.
+        </div>
+      </div>
+    </div>
+
+    <div class="card contact-card">
+      <div class="section-title">📞 Contact & Support</div>
+      
+      <div class="contact-item">
+        <strong>📧 Email:</strong> <span class="contact-value">mohittejgowraa@gmail.com</span>
+      </div>
+      
+      <div class="contact-item">
+        <strong>📱 Phone:</strong> <span class="contact-value">+91 7382260206</span>
+      </div>
+      
+      <div class="highlight-box">
+        <strong>⚡ Report Issues & Send Suggestions</strong><br><br>
+        Have you encountered a development issue or bug? Found a feature you'd like to see? Want to collaborate or provide general feedback? We're here to listen! Reach out using the contact details above. We respond quickly and value every piece of feedback.
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>ProDine © 2026 | <a href="https://github.com/Mohittej12/ProDine-Mobile-App">View on GitHub</a> | Made with ❤️ for restaurant owners</p>
     </div>
   </div>
 </body>
