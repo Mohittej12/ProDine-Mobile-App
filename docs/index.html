@@ -316,18 +316,17 @@
       text-decoration: none;
       font-weight: 700;
       font-size: 1.2rem;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
       box-shadow: 0 8px 25px rgba(255, 107, 107, 0.35);
       cursor: pointer;
       border: none;
-      animation: pulse 2s ease-in-out infinite;
     }
     .download-btn:hover {
-      transform: translateY(-5px) scale(1.05);
-      box-shadow: 0 15px 45px rgba(255, 107, 107, 0.6);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 35px rgba(255, 107, 107, 0.45);
     }
     .download-btn:active {
-      transform: translateY(-2px) scale(0.98);
+      transform: translateY(-1px);
     }
     .download-info {
       color: #999;
@@ -337,22 +336,83 @@
     }
     .survey-section {
       background: linear-gradient(135deg, #f5f7fa 0%, #fffbf0 100%);
-      padding: 20px;
-      border-radius: 12px;
+      padding: 24px;
+      border-radius: 20px;
       margin: 25px 0;
       border-left: 5px solid #ffd93d;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
       animation: fadeInUp 0.8s ease-out 0.3s both;
-      transition: all 0.3s ease-out;
+      transition: box-shadow 0.3s ease;
     }
     .survey-section:hover {
-      background: linear-gradient(135deg, #f0f5f9 0%, #fff9f0 100%);
-      transform: translateX(5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
     }
     .survey-text {
-      color: #555;
+      color: #333;
       font-size: 1rem;
-      line-height: 1.6;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+    .survey-form {
+      display: grid;
+      gap: 15px;
+    }
+    .survey-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .survey-field label {
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .survey-field input,
+    .survey-field textarea,
+    .survey-field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      color: #1f2937;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .survey-field input:focus,
+    .survey-field textarea:focus,
+    .survey-field select:focus {
+      border-color: #34d399;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+    }
+    .survey-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .survey-button {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+    }
+    .survey-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3);
+    }
+    .survey-button:active {
+      transform: translateY(-1px);
+    }
+    .survey-helper {
+      color: #475569;
+      font-size: 0.9rem;
+      margin-top: 6px;
     }
     .contact-card {
       background: linear-gradient(135deg, #2a5298 0%, #1e3c72 50%, #1a2f5a 100%);
@@ -541,9 +601,45 @@
 
       <div class="survey-section">
         <div class="survey-text">
-          <strong>💬 Help Us Improve!</strong><br><br>
-          We're constantly working to make ProDine better. Have you found a bug? Do you have suggestions for new features? Your feedback is invaluable and helps us deliver an even better experience.
+          <strong>💬 We want your feedback</strong><br><br>
+          Share your experience with ProDine and help us make the app smoother, faster, and easier to use.
         </div>
+        <form class="survey-form" action="#" method="post">
+          <div class="survey-field">
+            <label for="name">Your Name</label>
+            <input id="name" name="name" type="text" placeholder="Enter your name" />
+          </div>
+          <div class="survey-field">
+            <label for="email">Email Address</label>
+            <input id="email" name="email" type="email" placeholder="Enter your email" />
+          </div>
+          <div class="survey-field">
+            <label for="experience">How was your app experience?</label>
+            <select id="experience" name="experience">
+              <option selected disabled>Select one</option>
+              <option>Excellent</option>
+              <option>Good</option>
+              <option>Average</option>
+              <option>Poor</option>
+            </select>
+          </div>
+          <div class="survey-field">
+            <label for="most-used">What feature do you use most?</label>
+            <input id="most-used" name="most_used" type="text" placeholder="e.g. Menu management, order tracking" />
+          </div>
+          <div class="survey-field">
+            <label for="improvement">What should we improve?</label>
+            <textarea id="improvement" name="improvement" rows="3" placeholder="Tell us one thing we can make better"></textarea>
+          </div>
+          <div class="survey-field">
+            <label for="suggestions">Any feature suggestions?</label>
+            <textarea id="suggestions" name="suggestions" rows="3" placeholder="Share your feature ideas"></textarea>
+          </div>
+          <div class="survey-actions">
+            <button type="submit" class="survey-button">Send Feedback</button>
+          </div>
+          <div class="survey-helper">Thank you for helping us improve ProDine. Your response will make the next version better.</div>
+        </form>
       </div>
     </div>
 
