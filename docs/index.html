@@ -177,38 +177,17 @@
       box-shadow: 0 15px 40px rgba(0,0,0,0.2);
       animation: fadeInDown 0.8s ease-out;
     }
-    .logo-brand {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      background: #ffffff;
-      padding: 18px 24px;
-      border-radius: 18px;
+    .logo {
+      max-width: 220px;
+      width: 100%;
+      height: auto;
       margin-bottom: 20px;
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+      display: inline-block;
       transition: transform 0.35s ease, box-shadow 0.35s ease;
     }
-    .logo-brand:hover {
+    .logo:hover {
       transform: translateY(-3px);
       box-shadow: 0 24px 55px rgba(0, 0, 0, 0.18);
-    }
-    .logo-brand .brand-name {
-      color: #d12b2b;
-      font-size: 2.4rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1;
-    }
-    .logo-brand .brand-app {
-      color: #111;
-      font-size: 1.6rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-    .logo {
-      display: none;
     }
     h1 {
       font-size: 3rem;
@@ -572,10 +551,7 @@
   </div>
   <div class="container">
     <div class="logo-section">
-      <div class="logo-brand">
-        <span class="brand-name">Prodapt</span>
-        <span class="brand-app">ProDine</span>
-      </div>
+      <img src="../assets/images/app_logo.png" alt="Prodapt ProDine Logo" class="logo" />
       <h1>ProDine</h1>
       <p class="tagline">Smart Cafeteria Application</p>
       <p class="subtitle">Streamline your cafeteria operations with advanced ordering and menu management</p>
