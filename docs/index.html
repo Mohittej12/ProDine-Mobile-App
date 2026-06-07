@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ProDine - Restaurant Management App</title>
+  <title>ProDine - Prodapt Solutions Pvt Ltd - Cafeteria App</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
@@ -59,6 +59,36 @@
       }
     }
     
+    @keyframes rainbowGlow {
+      0% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); }
+      16% { box-shadow: 0 0 20px rgba(255, 127, 0, 0.4); }
+      33% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); }
+      66% { box-shadow: 0 0 20px rgba(0, 0, 255, 0.4); }
+      83% { box-shadow: 0 0 20px rgba(75, 0, 130, 0.4); }
+      100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); }
+    }
+    
+    @keyframes rainbowBorder {
+      0% { border-color: #ff0000; }
+      16% { border-color: #ff7f00; }
+      33% { border-color: #ffff00; }
+      50% { border-color: #00ff00; }
+      66% { border-color: #0000ff; }
+      83% { border-color: #4b0082; }
+      100% { border-color: #ff0000; }
+    }
+    
+    @keyframes rainbowText {
+      0% { color: #ff0000; }
+      16% { color: #ff7f00; }
+      33% { color: #ffff00; }
+      50% { color: #00ff00; }
+      66% { color: #0000ff; }
+      83% { color: #4b0082; }
+      100% { color: #ff0000; }
+    }
+    
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7aa8d1 100%);
@@ -93,6 +123,7 @@
     }
     .logo:hover {
       transform: scale(1.1) rotate(5deg);
+      animation: rainbowGlow 3s ease-in-out;
     }
     h1 {
       font-size: 3rem;
@@ -132,6 +163,7 @@
     .card:hover {
       transform: translateY(-8px);
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      animation: rainbowGlow 3s ease-in-out infinite;
     }
     .card.feature-card {
       border-top: 6px solid #4ecdc4;
@@ -185,6 +217,7 @@
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 15px 35px rgba(78, 205, 196, 0.3);
       background: linear-gradient(135deg, #e8f4f8 0%, #e0eff4 100%);
+      animation: rainbowGlow 3s ease-in-out forwards;
     }
     .feature-icon {
       font-size: 2rem;
@@ -193,6 +226,7 @@
     }
     .feature:hover .feature-icon {
       transform: scale(1.2) rotate(10deg);
+      animation: rainbowText 3s ease-in-out infinite;
     }
     .feature strong { 
       color: #2a5298;
@@ -227,6 +261,7 @@
     .download-btn:hover {
       transform: translateY(-5px) scale(1.05);
       box-shadow: 0 15px 45px rgba(255, 107, 107, 0.6);
+      animation: rainbowGlow 3s ease-in-out forwards;
     }
     .download-btn:active {
       transform: translateY(-2px) scale(0.98);
@@ -342,6 +377,43 @@
       .card { padding: 25px; }
       .download-btn { font-size: 1rem; padding: 14px 35px; }
     }
+    
+    @media (max-width: 768px) {
+      .logo-section { padding: 30px 15px; }
+      h1 { font-size: 2.2rem; }
+      .tagline { font-size: 1.1rem; }
+      .subtitle { font-size: 0.9rem; }
+      .card { padding: 30px; margin-bottom: 20px; }
+      .section-title { font-size: 1.6rem; }
+      .description { font-size: 1rem; }
+      .features { gap: 15px; }
+      .feature { padding: 18px; }
+      .contact-item { font-size: 1rem; margin: 15px 0; }
+    }
+    
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .container { max-width: 100%; }
+      .logo { max-width: 150px; padding: 10px; }
+      h1 { font-size: 1.8rem; margin-bottom: 5px; }
+      .tagline { font-size: 1rem; }
+      .subtitle { font-size: 0.85rem; }
+      .card { padding: 20px; margin-bottom: 15px; }
+      .section-title { font-size: 1.2rem; gap: 8px; }
+      .section-title::before { height: 20px; width: 4px; }
+      .description { font-size: 0.95rem; line-height: 1.6; }
+      .features { gap: 12px; }
+      .feature { padding: 15px; border-left-width: 4px; }
+      .feature-icon { font-size: 1.8rem; }
+      .feature strong { font-size: 1rem; }
+      .feature p { font-size: 0.9rem; }
+      .download-btn { font-size: 0.95rem; padding: 12px 30px; }
+      .download-info { font-size: 0.85rem; }
+      .contact-item { font-size: 0.95rem; padding: 10px; margin: 12px 0; }
+      .contact-value { margin-left: 5px; }
+      .highlight-box { padding: 12px; font-size: 0.9rem; }
+      .footer { font-size: 0.85rem; padding: 15px; }
+    }
   </style>
 </head>
 <body>
@@ -349,14 +421,14 @@
     <div class="logo-section">
       <img src="../assets/images/app_logo.png" alt="ProDine Logo" class="logo" onerror="this.src='../assets/images/app_icon.png'" />
       <h1>ProDine</h1>
-      <p class="tagline">Smart Restaurant & Food Provider Management</p>
-      <p class="subtitle">Streamline your restaurant operations with advanced ordering and menu management</p>
+      <p class="tagline">Smart Cafeteria Application</p>
+      <p class="subtitle">Streamline your cafeteria operations with advanced ordering and menu management</p>
     </div>
 
     <div class="card">
       <div class="section-title">About ProDine</div>
       <p class="description">
-        ProDine is a cutting-edge mobile application designed to revolutionize how restaurants and food providers operate. From small cafés to large restaurant chains, ProDine provides powerful tools to manage menus, track orders in real-time, and streamline your entire food service business. Our intuitive interface and robust features make restaurant management effortless.
+        ProDine is a cutting-edge mobile application designed for Prodapt Solutions Pvt. Ltd to revolutionize how restaurants and food providers operate. From small cafés to large restaurant chains, ProDine provides powerful tools to manage menus, track orders in real-time, and streamline your entire food service business. Our intuitive interface and robust features make restaurant management effortless.
       </p>
     </div>
 
