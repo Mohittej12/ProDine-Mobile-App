@@ -3,34 +3,190 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Download ProDine APK</title>
+  <title>ProDine - Restaurant Management App</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:40px auto;padding:0 16px;color:#222}
-    .card{border:1px solid #e1e4e8;padding:20px;border-radius:8px}
-    h1{margin-top:0}
-    .qr{margin-top:20px;text-align:center}
-    .btn{display:inline-block;padding:12px 20px;background:#0366d6;color:#fff;border-radius:6px;text-decoration:none}
-    .note{font-size:0.9rem;color:#555;margin-top:8px}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 700px; margin: 0 auto; }
+    .header {
+      text-align: center;
+      padding: 40px 20px;
+      color: #fff;
+    }
+    .logo {
+      max-width: 120px;
+      height: auto;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .tagline {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .info-section {
+      margin-bottom: 25px;
+    }
+    .info-section h2 {
+      color: #667eea;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+    .info-section p {
+      color: #555;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .feature {
+      background: #f0f4ff;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    .feature strong { color: #667eea; }
+    .download-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 20px 0;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+    }
+    .contact-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      margin-top: 25px;
+    }
+    .contact-section h3 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+    .contact-item {
+      margin: 12px 0;
+      font-size: 1rem;
+    }
+    .contact-item strong { font-weight: 600; }
+    .highlight {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      border-left: 3px solid #fff;
+    }
+    .survey-text {
+      color: #666;
+      font-size: 0.95rem;
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      background: #667eea;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>ProDine — Download APK</h1>
-    <p>Scan the QR code below or tap the button to download the Android APK.</p>
-
-    <p>
-      <a class="btn" href="https://github.com/Mohittej12/ProDine-Mobile-App/releases/download/v1.0.0/app-release.apk">Download APK</a>
-    </p>
-    <p class="note">If the APK doesn't download automatically, long-press the link and choose "Download" (Android) or open in browser.</p>
-
-    <div class="qr">
-      <p><strong>Scan to download</strong></p>
-      <img alt="QR code" src="https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=https%3A%2F%2Fgithub.com%2FMohittej12%2FProDine-Mobile-App%2Freleases%2Fdownload%2Fv1.0.0%2Fapp-release.apk" />
-      <p class="note">QR points to the GitHub Release download URL for the APK. Hosted via GitHub Pages requires enabling Pages in repo settings.</p>
+  <div class="container">
+    <div class="header">
+      <img src="../assets/images/brand_logo.png" alt="ProDine Logo" class="logo" />
+      <h1>ProDine</h1>
+      <p class="tagline">Smart Restaurant & Food Provider Management</p>
     </div>
 
-    <hr>
-    <p class="note">To host this page with GitHub Pages: enable Pages in repository settings and set source to the `docs/` folder on branch `main` — the site will be available at <a href="https://mohittej12.github.io/ProDine-Mobile-App/">https://mohittej12.github.io/ProDine-Mobile-App/</a>.</p>
+    <div class="card">
+      <div class="info-section">
+        <h2>📱 What is ProDine?</h2>
+        <p>ProDine is a comprehensive mobile application designed for restaurants and food providers to manage menus, orders, and delivery operations efficiently. Whether you're running a small café or a large restaurant, ProDine streamlines your business with powerful tools and intuitive design.</p>
+      </div>
+
+      <div class="info-section">
+        <h2>⭐ Key Features</h2>
+        <div class="features">
+          <div class="feature">
+            <strong>📋 Menu Management</strong>
+            <p>Easy CRUD operations for food items</p>
+          </div>
+          <div class="feature">
+            <strong>📦 Order Tracking</strong>
+            <p>Real-time order status updates</p>
+          </div>
+          <div class="feature">
+            <strong>👤 Vendor Dashboard</strong>
+            <p>Role-based access control</p>
+          </div>
+          <div class="feature">
+            <strong>🔗 Deep Links</strong>
+            <p>Seamless app integration</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="https://github.com/Mohittej12/ProDine-Mobile-App/releases/download/v1.0.0/app-release.apk" class="download-btn">⬇️ Download APK (v1.0.0)</a>
+        <p style="color: #999; font-size: 0.9rem; margin-top: 10px;">Size: ~68 MB | Requires Android 5.0+</p>
+      </div>
+
+      <div class="survey-text">
+        We'd love to hear from you! Have suggestions, found bugs, or want to suggest improvements? Your feedback helps us build a better app.
+      </div>
+
+      <div class="contact-section">
+        <h3>📞 Get in Touch & Provide Feedback</h3>
+        <div class="contact-item">
+          <strong>📧 Email:</strong> <span style="color: #ffd700;">mohittejgowraa@gmail.com</span>
+        </div>
+        <div class="contact-item">
+          <strong>📱 Phone:</strong> <span style="color: #ffd700;">+91 7382260206</span>
+        </div>
+        <div class="highlight">
+          <strong>⚡ Report Issues & Send Suggestions</strong><br>
+          Have a development issue, bug report, or feature suggestion? Contact us using the details above. We respond quickly and value your input!
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; color: #fff; margin-top: 30px; font-size: 0.9rem;">
+      <p>ProDine © 2026 | <a href="https://github.com/Mohittej12/ProDine-Mobile-App" style="color: #ffd700;">View on GitHub</a></p>
+    </div>
   </div>
 </body>
 </html>

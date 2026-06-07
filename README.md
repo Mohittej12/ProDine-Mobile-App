@@ -9,8 +9,9 @@ ProDine is a cross-platform Flutter app that helps vendors manage menus, orders,
 ## Quick Links
 
 - Source: https://github.com/Mohittej12/ProDine-Mobile-App
-- APK (raw): https://raw.githubusercontent.com/Mohittej12/ProDine-Mobile-App/main/app-release.apk
-- Demo / Download page: (enable GitHub Pages -> `docs/`) once enabled: https://mohittej12.github.io/ProDine-Mobile-App/
+- APK Download: https://github.com/Mohittej12/ProDine-Mobile-App/releases/download/v1.0.0/app-release.apk
+- Demo / Download Page: https://mohittej12.github.io/ProDine-Mobile-App/
+- GitHub Releases: https://github.com/Mohittej12/ProDine-Mobile-App/releases
 
 ## Key Features
 
@@ -50,15 +51,21 @@ The repository already includes a release APK at `app-release.apk` for quick tes
 
 ## Hosting the APK & Download Page
 
-I added a simple download page at `docs/index.html` that links to the APK and contains a QR code for easy distribution. To publish it via GitHub Pages:
+The app is hosted with GitHub Pages and a professional download page at `docs/index.html`. GitHub Pages is already enabled for this repository:
 
-1. Go to **Settings → Pages** in your repository.
-2. Choose branch: `main` and folder: `/docs`.
-3. Leave **Custom domain** blank (unless you have one) and save.
+- **Pages Site:** https://mohittej12.github.io/ProDine-Mobile-App/
+- **Branch:** `main`
+- **Source Folder:** `/docs`
 
-The site will publish at `https://mohittej12.github.io/ProDine-Mobile-App/`. The QR code on the page points to the raw APK URL so users can download the APK directly.
+The download page includes:
+- ProDine app information and key features
+- One-click APK download button (via GitHub Releases)
+- Contact information for feedback and support
+- Professional, responsive design
 
-Note: The APK is ~65 MB — GitHub warns about large files. For production distribution, prefer GitHub Releases, Google Play, or an external CDN.
+Users can download the APK directly from the GitHub Release or via the hosted download page.
+
+For large file management, the repository uses **Git LFS** to track `.apk` files efficiently.
 
 ## Contributing
 
@@ -67,8 +74,22 @@ Note: The APK is ~65 MB — GitHub warns about large files. For production distr
 
 ## License & Contact
 
-Specify your license here (e.g., MIT) and contact information for contributors or users.
+**ProDine** is released under the MIT License.
+
+### 📞 Get in Touch & Feedback
+
+Have suggestions, found bugs, or want to report development issues? We'd love to hear from you! Your feedback helps us build a better app.
+
+**Contact Information:**
+- **📧 Email:** [mohittejgowraa@gmail.com](mailto:mohittejgowraa@gmail.com)
+- **📱 Phone:** [+91 7382260206](tel:+917382260206)
+
+**Feel free to reach out for:**
+- Bug reports and issue tracking
+- Feature suggestions and improvements
+- General inquiries and support
+- Collaboration opportunities
 
 ---
 
-If you want, I can: enable GitHub Pages via the API (requires a token), move the APK to a Release, or set up Git LFS for large binaries. Tell me which you prefer.
+If you want to host this app further or need deployment help, check the [GitHub Releases](https://github.com/Mohittej12/ProDine-Mobile-App/releases) page for the latest APK build.
