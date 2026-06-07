@@ -114,31 +114,54 @@
       opacity: 0;
       visibility: hidden;
     }
-    .loader-ring {
-      width: 90px;
-      height: 90px;
+    .loader-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+    }
+    .loader-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+    .loader-dot {
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      border: 5px solid rgba(255,255,255,0.12);
-      border-top-color: #ffd93d;
-      animation: spin 1.2s linear infinite;
-      box-shadow: 0 0 20px rgba(255,217,61,0.25);
+      background: #2563EB;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.35);
+      opacity: 0.3;
+      transform: scale(0.82);
+      animation: dotPulse 1.1s ease-in-out infinite;
+    }
+    .loader-dot:nth-child(2) {
+      background: #059669;
+      box-shadow: 0 0 12px rgba(5, 150, 105, 0.35);
+      animation-delay: 0.22s;
+    }
+    .loader-dot:nth-child(3) {
+      background: #06B6D4;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
+      animation-delay: 0.44s;
     }
     .loader-title {
-      margin-top: 24px;
-      font-size: 1.8rem;
-      letter-spacing: 0.22em;
+      font-size: 2rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #ffd93d;
+      color: #ffffff;
       animation: fadeInDown 0.8s ease-out both;
     }
     .loader-subtitle {
-      margin-top: 10px;
-      font-size: 0.95rem;
-      color: #e5e5ff;
+      font-size: 1rem;
+      color: #cbd5e1;
       animation: fadeInUp 0.8s ease-out 0.2s both;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.25; transform: scale(0.82); }
+      50% { opacity: 1; transform: scale(1.05); }
     }
     .container { max-width: 920px; margin: 0 auto; padding: 0 20px; }
     .nav-bar {
@@ -459,9 +482,15 @@
 </head>
 <body>
   <div class="loader-overlay">
-    <div class="loader-ring"></div>
-    <div class="loader-title">ProDine</div>
-    <div class="loader-subtitle">Preparing your experience...</div>
+    <div class="loader-stage">
+      <div class="loader-title">ProDine</div>
+      <div class="loader-subtitle">A smart cafeteria Application</div>
+      <div class="loader-dots">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
   </div>
   <div class="container">
     <div class="logo-section">
@@ -541,11 +570,20 @@
     </div>
   </div>
   <script>
-    window.addEventListener('load', function() {
-      const loader = document.querySelector('.loader-overlay');
+    const startTime = performance.now();
+    const loader = document.querySelector('.loader-overlay');
+    const minDuration = 3000;
+
+    function finishLoader() {
       if (!loader) return;
       loader.classList.add('loaded');
       setTimeout(() => loader.remove(), 600);
+    }
+
+    window.addEventListener('load', function() {
+      const elapsed = performance.now() - startTime;
+      const remaining = Math.max(0, minDuration - elapsed);
+      setTimeout(finishLoader, remaining);
     });
   </script>
 </body>
