@@ -383,6 +383,16 @@
       font-weight: 600;
       color: #1f2937;
     }
+    .required-star {
+      color: #dc2626;
+      margin-left: 4px;
+      font-size: 1rem;
+    }
+    .required-note {
+      color: #92400e;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
     .survey-field input,
     .survey-field textarea,
     .survey-field select {
@@ -570,7 +580,7 @@
   </div>
   <div class="container">
     <div class="logo-section">
-      <img src="../assets/images/app_logo.png" alt="Prodapt ProDine Logo" class="logo" />
+      <img src="assets/images/app_logo.png" alt="Prodapt ProDine Logo" class="logo" />
       <h1>ProDine</h1>
       <p class="tagline">Smart Cafeteria Application</p>
       <p class="subtitle">Streamline your cafeteria operations with advanced ordering and menu management</p>
@@ -625,19 +635,20 @@
           <strong>💬 We want your feedback</strong><br><br>
           Share your experience with ProDine and help us make the app smoother, faster, and easier to use.
         </div>
+        <div class="required-note">All fields are required. Please complete every question before submitting.</div>
         <form class="survey-form" action="#" method="post">
           <div class="survey-field">
-            <label for="name">Your Name</label>
-            <input id="name" name="name" type="text" placeholder="Enter your name" />
+            <label for="name">Your Name<span class="required-star">*</span></label>
+            <input id="name" name="name" type="text" placeholder="Enter your name" required />
           </div>
           <div class="survey-field">
-            <label for="email">Email Address</label>
-            <input id="email" name="email" type="email" placeholder="Enter your email" />
+            <label for="email">Email Address<span class="required-star">*</span></label>
+            <input id="email" name="email" type="email" placeholder="Enter your email" required />
           </div>
           <div class="survey-field">
-            <label for="experience">How was your app experience?</label>
-            <select id="experience" name="experience">
-              <option selected disabled>Select one</option>
+            <label for="experience">How was your app experience?<span class="required-star">*</span></label>
+            <select id="experience" name="experience" required>
+              <option value="" selected disabled>Select one</option>
               <option>Excellent</option>
               <option>Good</option>
               <option>Average</option>
@@ -645,16 +656,16 @@
             </select>
           </div>
           <div class="survey-field">
-            <label for="most-used">What feature do you use most?</label>
-            <input id="most-used" name="most_used" type="text" placeholder="e.g. Menu management, order tracking" />
+            <label for="most-used">What feature do you use most?<span class="required-star">*</span></label>
+            <input id="most-used" name="most_used" type="text" placeholder="e.g. Menu management, order tracking" required />
           </div>
           <div class="survey-field">
-            <label for="improvement">What should we improve?</label>
-            <textarea id="improvement" name="improvement" rows="3" placeholder="Tell us one thing we can make better"></textarea>
+            <label for="improvement">What should we improve?<span class="required-star">*</span></label>
+            <textarea id="improvement" name="improvement" rows="3" placeholder="Tell us one thing we can make better" required></textarea>
           </div>
           <div class="survey-field">
-            <label for="suggestions">Any feature suggestions?</label>
-            <textarea id="suggestions" name="suggestions" rows="3" placeholder="Share your feature ideas"></textarea>
+            <label for="suggestions">Any feature suggestions?<span class="required-star">*</span></label>
+            <textarea id="suggestions" name="suggestions" rows="3" placeholder="Share your feature ideas" required></textarea>
           </div>
           <div class="survey-actions">
             <button type="submit" class="survey-button">Send Feedback</button>
@@ -700,6 +711,10 @@
     if (surveyForm) {
       surveyForm.addEventListener('submit', function(event) {
         event.preventDefault();
+        if (!surveyForm.checkValidity()) {
+          surveyForm.reportValidity();
+          return;
+        }
         alert('Thank you for your feedback!');
         surveyForm.reset();
       });
